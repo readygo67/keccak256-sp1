@@ -1,0 +1,26 @@
+[package]
+version = "0.1.0"
+name = "keccak256-script"
+edition = "2021"
+default-run = "keccak256"
+
+[[bin]]
+name = "keccak256"
+path = "src/bin/main.rs"
+
+
+[[bin]]
+name = "vkey"
+path = "src/bin/vkey.rs"
+
+[dependencies]
+sp1-zkvm = { workspace = true }
+tiny-keccak = { workspace = true }
+sp1-sdk = "4.2.0"
+clap = { version = "4.0", features = ["derive", "env"] }
+tracing = "0.1.40"
+hex = "0.4.3"
+dotenv = "0.15.0"
+
+[build-dependencies]
+sp1-build = "4.2.0"

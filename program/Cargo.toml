@@ -1,0 +1,9 @@
+[package]
+name = "keccak256-program"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sp1-zkvm = { workspace = true }
+tiny-keccak = { workspace = true }
+
