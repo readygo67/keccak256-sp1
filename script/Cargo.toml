@@ -21,6 +21,7 @@ clap = { version = "4.0", features = ["derive", "env"] }
 tracing = "0.1.40"
 hex = "0.4.3"
 dotenv = "0.15.0"
+keccak256-lib = { path = "../lib" }
 
 [build-dependencies]
 sp1-build = "4.2.0"
