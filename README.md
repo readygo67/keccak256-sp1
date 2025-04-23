@@ -22,7 +22,7 @@ To run the program without generating a proof:
 
 ```sh
 cd script
-RUST_LOG=info cargo run --release -- --execute --input "0x000000" //hex encoded input
+RUST_LOG=info cargo run --release -- --execute --input "000000" //hex encoded input
 ```
 
 This will execute the program and display the output.
