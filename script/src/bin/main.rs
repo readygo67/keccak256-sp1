@@ -12,7 +12,7 @@
 
 use clap::Parser;
 use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
-use tiny_keccak::{Hasher, Keccak};
+use keccak256_lib::keccak256_iterations;
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const KECCAK256_ELF: &[u8] = include_elf!("keccak256-program");
@@ -26,6 +26,9 @@ struct Args {
 
     #[arg(long)]
     prove: bool,
+    
+    #[arg(long, default_value = "100")]
+    n: u32,
 
     #[arg(long, default_value = "000000")]
     input: String,
@@ -53,6 +56,7 @@ fn main() {
     let _input = hex::decode(args.input.clone()).unwrap();
 
     let mut stdin = SP1Stdin::new();
+    stdin.write(&args.n);
     stdin.write(&_input);
 
     if args.execute {
@@ -61,13 +65,8 @@ fn main() {
         println!("Program executed successfully.");
 
         // Read the output.
-        let output = _output.as_slice();
-        let mut expected_output = [0u8; 32];
-        {
-            let mut hasher = Keccak::v256();
-            hasher.update(&_input);
-            hasher.finalize(&mut expected_output);
-        }
+        let output = _output.to_vec();
+        let expected_output = keccak256_iterations(args.n,_input);
 
         assert_eq!(output, expected_output);
         println!("Values are correct!");
@@ -89,7 +88,7 @@ fn main() {
         // Verify the proof.
         client.verify(&proof, &vk).expect("failed to verify proof");
 
-        let path = format!("keccak256_{}.proof", args.input);
+        let path = format!("keccak256_{}_{}.proof", args.n, args.input);
         proof.save(&path).expect("Failed to save proof");
 
         println!("Successfully verified proof!");
