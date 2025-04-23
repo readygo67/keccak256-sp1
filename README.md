@@ -10,8 +10,7 @@ that can generate a proof of any RISC-V program.
 
 ## Running the Project
 
-There are 3 main ways to run this project: execute a program, generate a core proof, and
-generate an EVM-compatible proof.
+There are 3 main ways to run this project: execute a program, generate a core proof.
 
 ### Build the Program
 
@@ -23,7 +22,7 @@ To run the program without generating a proof:
 
 ```sh
 cd script
-cargo run --release -- --execute
+RUST_LOG=info cargo run --release -- --execute --input "0x000000" //hex encoded input
 ```
 
 This will execute the program and display the output.
@@ -34,56 +33,11 @@ To generate an SP1 [core proof](https://docs.succinct.xyz/docs/sp1/generating-pr
 
 ```sh
 cd script
-cargo run --release -- --prove
+RUST_LOG=info cargo run --release -- --prove --input "000000" //hex encoded oinput 
 ```
 
-### Generate an EVM-Compatible Proof
-
-> [!WARNING]
-> You will need at least 16GB RAM to generate a Groth16 or PLONK proof. View the [SP1 docs](https://docs.succinct.xyz/docs/sp1/getting-started/hardware-requirements#local-proving) for more information.
-
-Generating a proof that is cheap to verify on the EVM (e.g. Groth16 or PLONK) is more intensive than generating a core proof.
-
-To generate a Groth16 proof:
-
+### Get the Vk's digest
 ```sh
 cd script
-cargo run --release --bin evm -- --system groth16
-```
-
-To generate a PLONK proof:
-
-```sh
-cargo run --release --bin evm -- --system plonk
-```
-
-These commands will also generate fixtures that can be used to test the verification of SP1 proofs
-inside Solidity.
-
-### Retrieve the Verification Key
-
-To retrieve your `programVKey` for your on-chain contract, run the following command in `script`:
-
-```sh
-cargo run --release --bin vkey
-```
-
-## Using the Prover Network
-
-We highly recommend using the [Succinct Prover Network](https://docs.succinct.xyz/docs/network/introduction) for any non-trivial programs or benchmarking purposes. For more information, see the [key setup guide](https://docs.succinct.xyz/docs/network/developers/key-setup) to get started.
-
-To get started, copy the example environment file:
-
-```sh
-cp .env.example .env
-```
-
-Then, set the `SP1_PROVER` environment variable to `network` and set the `NETWORK_PRIVATE_KEY`
-environment variable to your whitelisted private key.
-
-For example, to generate an EVM-compatible proof using the prover network, run the following
-command:
-
-```sh
-SP1_PROVER=network NETWORK_PRIVATE_KEY=... cargo run --release --bin evm
+RUST_LOG=info cargo run --bin vkey
 ```
