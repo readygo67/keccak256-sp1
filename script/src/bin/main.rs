@@ -11,8 +11,9 @@
 //! ```
 
 use clap::Parser;
-use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
 use keccak256_lib::keccak256_iterations;
+use sp1_sdk::{include_elf, ProverClient, SP1Stdin};
+use std::time::SystemTime;
 
 /// The ELF (executable and linkable format) file for the Succinct RISC-V zkVM.
 pub const KECCAK256_ELF: &[u8] = include_elf!("keccak256-program");
@@ -26,7 +27,7 @@ struct Args {
 
     #[arg(long)]
     prove: bool,
-    
+
     #[arg(long, default_value = "100")]
     n: u32,
 
@@ -66,7 +67,7 @@ fn main() {
 
         // Read the output.
         let output = _output.to_vec();
-        let expected_output = keccak256_iterations(args.n,_input);
+        let expected_output = keccak256_iterations(args.n, _input);
 
         assert_eq!(output, expected_output);
         println!("Values are correct!");
@@ -75,13 +76,19 @@ fn main() {
         println!("Number of cycles: {}", report.total_instruction_count());
     } else {
         // Setup the program for proving.
+        let mut temp_timestamp = SystemTime::now();
+        println!("client_init_start: {:?}", temp_timestamp);
         let (pk, vk) = client.setup(KECCAK256_ELF);
+
+        let client_setup_duration = SystemTime::now().duration_since(temp_timestamp).unwrap();
+        temp_timestamp = SystemTime::now();
 
         // Generate the proof
         let proof = client
             .prove(&pk, &stdin)
             .run()
             .expect("failed to generate proof");
+        let proof_duration = SystemTime::now().duration_since(temp_timestamp).unwrap();
 
         println!("Successfully generated proof!");
 
@@ -92,5 +99,8 @@ fn main() {
         proof.save(&path).expect("Failed to save proof");
 
         println!("Successfully verified proof!");
+
+        println!("client setup duration: {:?}", client_setup_duration);
+        println!("proof duration: {:?}", proof_duration);
     }
 }

@@ -15,7 +15,6 @@ path = "src/bin/vkey.rs"
 
 [dependencies]
 sp1-zkvm = { workspace = true }
-tiny-keccak = { workspace = true }
 sp1-sdk = "4.2.0"
 clap = { version = "4.0", features = ["derive", "env"] }
 tracing = "0.1.40"
